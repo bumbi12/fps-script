@@ -24,7 +24,7 @@ local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 20)
 title.Position = UDim2.new(0, 0, 0, 0)
 title.BackgroundTransparency = 1
-title.Text = "TPM Fisch Hub v1"
+title.Text = "TPM FPS Hub v1"
 title.Font = Enum.Font.GothamBold
 title.TextSize = 12
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -35,7 +35,7 @@ local fpsLabel = Instance.new("TextLabel")
 fpsLabel.Size = UDim2.new(1, 0, 0, 25)
 fpsLabel.Position = UDim2.new(0, 0, 0, 25)
 fpsLabel.BackgroundTransparency = 1
-fpsLabel.Text = "FPS: Calculating..."
+fpsLabel.Text = "FPS: Đang tính toán..."
 fpsLabel.Font = Enum.Font.Gotham
 fpsLabel.TextSize = 12
 fpsLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
@@ -46,7 +46,7 @@ local pingLabel = Instance.new("TextLabel")
 pingLabel.Size = UDim2.new(1, 0, 0, 25)
 pingLabel.Position = UDim2.new(0, 0, 0, 50)
 pingLabel.BackgroundTransparency = 1
-pingLabel.Text = "Ping: Calculating..."
+pingLabel.Text = "Ping: Đang tính toán..."
 pingLabel.Font = Enum.Font.Gotham
 pingLabel.TextSize = 12
 pingLabel.TextColor3 = Color3.fromRGB(0, 255, 255)
@@ -72,22 +72,13 @@ end
 local toggleButton = createButton("Ẩn", UDim2.new(1, -130, 0, 75), Color3.fromRGB(255, 100, 100))
 local killButton = createButton("Kill", UDim2.new(1, -65, 0, 75), Color3.fromRGB(255, 50, 50))
 
-toggleButton.MouseButton1Click:Connect(function()
-    panel.Visible = not panel.Visible
-    toggleButton.Text = panel.Visible and "Ẩn" or "Hiện"
-end)
-
-killButton.MouseButton1Click:Connect(function()
-    gui:Destroy()
-end)
-
--- Cập nhật FPS và Ping
+-- Tối ưu hóa FPS và Ping
 local RunService = game:GetService("RunService")
 local lastTick = tick()
 local fps
 local updateConnection
 
-updateConnection = RunService.Heartbeat:Connect(function()
+local function updateStats()
     local currentTick = tick()
     fps = math.floor(1 / (currentTick - lastTick))
     lastTick = currentTick
@@ -98,6 +89,36 @@ updateConnection = RunService.Heartbeat:Connect(function()
 
     fpsLabel.Text = "FPS: " .. tostring(fps)
     pingLabel.Text = "Ping: " .. (success and tostring(ping) .. " ms" or "N/A")
+
+    if fps < 30 then
+        fpsLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+        game:GetService("UserSettings").GameSettings.SavedQualityLevel = Enum.SavedQualitySetting.Automatic
+    else
+        fpsLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+    end
+end
+
+updateConnection = RunService.Heartbeat:Connect(updateStats)
+
+-- Tối ưu bộ nhớ
+RunService.Stepped:Connect(function()
+    collectgarbage("collect")
+end)
+
+-- Giới hạn FPS để tránh quá tải GPU
+if setfpscap then
+    setfpscap(60)
+end
+
+-- Nút ẩn/hiện
+toggleButton.MouseButton1Click:Connect(function()
+    panel.Visible = not panel.Visible
+    toggleButton.Text = panel.Visible and "Ẩn" or "Hiện"
+    if not panel.Visible then
+        updateConnection:Disconnect()
+    else
+        updateConnection = RunService.Heartbeat:Connect(updateStats)
+    end
 end)
 
 killButton.MouseButton1Click:Connect(function()
