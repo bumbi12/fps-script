@@ -1,4 +1,4 @@
-print("Excute")
+print("Đã load xong")
 
 print("Loading Function")
 
@@ -3853,7 +3853,7 @@ local function sendToWebhook()
 			Url = "",
 			Method = "POST",
 			Headers = { ["Content-Type"] = "application/json" },
-			Body = HttpService:JSONEncode({ username = "Attack Hub", embeds = { Embed } }),
+			Body = HttpService:JSONEncode({ username = "TamPham", embeds = { Embed } }),
 		}
 	end)
 end
