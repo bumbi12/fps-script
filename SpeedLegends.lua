@@ -11,7 +11,7 @@
 local Player = game:GetService("Players").LocalPlayer
 local Running = false
 local CollectedItems = 0
-local TeleportSpeed = 0.3
+local TeleportSpeed = 0
 local CollectDistance = 250
 
 -- =============================================
