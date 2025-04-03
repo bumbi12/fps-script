@@ -39,7 +39,7 @@ ScreenGui.Parent = CoreGui
 
 local MainWindow = Instance.new("Frame")
 MainWindow.Name = "MainWindow"
-MainWindow.Size = UDim2.new(0, 320, 0, 280)
+MainWindow.Size = UDim2.new(0, 320, 0, 330)
 MainWindow.Position = UDim2.new(0.5, -160, 0.5, -140)
 MainWindow.AnchorPoint = Vector2.new(0.5, 0.5)
 MainWindow.BackgroundColor3 = ColorPalette.Background
