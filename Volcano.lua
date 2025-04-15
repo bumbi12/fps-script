@@ -281,7 +281,7 @@ end)
 game:GetService("Players").LocalPlayer.OnTeleport:Connect(function(teleportState)
     if teleportState == Enum.TeleportState.Started and VolcanoModule.AutoExecute then
         syn.queue_on_teleport([[
-            loadstring(game:HttpGet("URL_TO_THIS_SCRIPT"))()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/bumbi12/kaph/refs/heads/main/Volcano.lua"))()
         ]])
     end
 end)
