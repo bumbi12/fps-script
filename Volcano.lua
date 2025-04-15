@@ -15,43 +15,53 @@ Frame.Active = true
 Frame.Draggable = true
 Frame.Parent = ScreenGui
 
+-- Bo góc mượt
 local UICorner = Instance.new("UICorner")
 UICorner.CornerRadius = UDim.new(0, 12)
 UICorner.Parent = Frame
 
--- Tạo hiệu ứng RGB chạy vòng quanh
+-- LED RGB chạy quanh viền (4 cạnh liền mạch)
 local borderParts = {}
-local borderPoints = {
-    {Position = UDim2.new(0, 0, 0, 0), Size = UDim2.new(1, 0, 0, 2)}, -- Top
-    {Position = UDim2.new(1, -2, 0, 0), Size = UDim2.new(0, 2, 1, 0)}, -- Right
-    {Position = UDim2.new(0, 0, 1, -2), Size = UDim2.new(1, 0, 0, 2)}, -- Bottom
-    {Position = UDim2.new(0, 0, 0, 0), Size = UDim2.new(0, 2, 1, 0)}  -- Left
-}
+local borderThickness = 3
+local borderAnimationSpeed = 0.02
 
-for i, point in ipairs(borderPoints) do
+-- Tạo 4 cạnh LED
+for i = 1, 4 do
     local part = Instance.new("Frame")
-    part.Size = point.Size
-    part.Position = point.Position
-    part.BackgroundColor3 = Color3.fromHSV(i/#borderPoints, 1, 1)
     part.BorderSizePixel = 0
     part.ZIndex = 2
     part.Parent = Frame
+    
+    if i == 1 then -- Top
+        part.Size = UDim2.new(1, 0, 0, borderThickness)
+        part.Position = UDim2.new(0, 0, 0, 0)
+    elseif i == 2 then -- Right
+        part.Size = UDim2.new(0, borderThickness, 1, 0)
+        part.Position = UDim2.new(1, -borderThickness, 0, 0)
+    elseif i == 3 then -- Bottom
+        part.Size = UDim2.new(1, 0, 0, borderThickness)
+        part.Position = UDim2.new(0, 0, 1, -borderThickness)
+    elseif i == 4 then -- Left
+        part.Size = UDim2.new(0, borderThickness, 1, 0)
+        part.Position = UDim2.new(0, 0, 0, 0)
+    end
+    
     table.insert(borderParts, part)
 end
 
--- Animation RGB chạy mượt
+-- Animation LED chạy mượt
 task.spawn(function()
-    local offset = 0
+    local hue = 0
     while ScreenGui.Parent do
-        offset = (offset + 0.01) % 1
-        for i, part in ipairs(borderParts) do
-            local hue = (offset + (i-1)/#borderParts) % 1
+        hue = (hue + 0.005) % 1
+        for _, part in ipairs(borderParts) do
             part.BackgroundColor3 = Color3.fromHSV(hue, 1, 1)
         end
-        task.wait(0.03)
+        task.wait(borderAnimationSpeed)
     end
 end)
 
+-- Title Bar
 local TitleBar = Instance.new("Frame")
 TitleBar.Size = UDim2.new(1, 0, 0, 35)
 TitleBar.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
@@ -61,14 +71,6 @@ TitleBar.Parent = Frame
 local UICornerTitle = Instance.new("UICorner")
 UICornerTitle.CornerRadius = UDim.new(0, 12)
 UICornerTitle.Parent = TitleBar
-
-local UIGradient = Instance.new("UIGradient")
-UIGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(80, 80, 120)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(40, 40, 80))
-})
-UIGradient.Rotation = 90
-UIGradient.Parent = TitleBar
 
 local Title = Instance.new("TextLabel")
 Title.Text = "SHINRAI DUNGEON"
@@ -81,6 +83,7 @@ Title.TextSize = 16
 Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Parent = TitleBar
 
+-- Nút đóng
 local CloseButton = Instance.new("TextButton")
 CloseButton.Text = "×"
 CloseButton.Size = UDim2.new(0, 35, 0, 35)
@@ -103,14 +106,16 @@ CloseButton.MouseLeave:Connect(function()
     CloseButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
 end)
 
+-- Nội dung chính
 local Content = Instance.new("Frame")
 Content.Size = UDim2.new(1, -20, 1, -60)
 Content.Position = UDim2.new(0, 10, 0, 50)
 Content.BackgroundTransparency = 1
 Content.Parent = Frame
 
+-- Phần Tự Phá Núi Lửa
 local ModuleLabel = Instance.new("TextLabel")
-ModuleLabel.Text = "DUNGEON FARMER"
+ModuleLabel.Text = "TỰ PHÁ NÚI LỬA"
 ModuleLabel.Size = UDim2.new(1, 0, 0, 24)
 ModuleLabel.BackgroundTransparency = 1
 ModuleLabel.TextColor3 = Color3.fromRGB(200, 200, 255)
@@ -120,7 +125,7 @@ ModuleLabel.TextXAlignment = Enum.TextXAlignment.Left
 ModuleLabel.Parent = Content
 
 local StatusLabel = Instance.new("TextLabel")
-StatusLabel.Text = "Status: OFF"
+StatusLabel.Text = "Trạng thái: TẮT"
 StatusLabel.Size = UDim2.new(0.5, 0, 0, 24)
 StatusLabel.Position = UDim2.new(0.5, 0, 0, 0)
 StatusLabel.BackgroundTransparency = 1
@@ -130,8 +135,9 @@ StatusLabel.TextSize = 14
 StatusLabel.TextXAlignment = Enum.TextXAlignment.Right
 StatusLabel.Parent = Content
 
+-- Nút BẬT/TẮT (bo góc + LED RGB)
 local ToggleButton = Instance.new("TextButton")
-ToggleButton.Text = "TOGGLE"
+ToggleButton.Text = "BẬT"
 ToggleButton.Size = UDim2.new(1, 0, 0, 32)
 ToggleButton.Position = UDim2.new(0, 0, 0, 30)
 ToggleButton.BackgroundColor3 = Color3.fromRGB(70, 70, 90)
@@ -144,18 +150,9 @@ local UICornerToggle = Instance.new("UICorner")
 UICornerToggle.CornerRadius = UDim.new(0, 8)
 UICornerToggle.Parent = ToggleButton
 
-ToggleButton.MouseEnter:Connect(function()
-    ToggleButton.BackgroundColor3 = Color3.fromRGB(90, 90, 110)
-end)
-
-ToggleButton.MouseLeave:Connect(function()
-    if not VolcanoModule.Running then
-        ToggleButton.BackgroundColor3 = Color3.fromRGB(70, 70, 90)
-    end
-end)
-
+-- Auto Execute
 local AutoLabel = Instance.new("TextLabel")
-AutoLabel.Text = "AUTO EXECUTE"
+AutoLabel.Text = "TỰ ĐỘNG KÍCH HOẠT"
 AutoLabel.Size = UDim2.new(1, 0, 0, 24)
 AutoLabel.Position = UDim2.new(0, 0, 0, 72)
 AutoLabel.BackgroundTransparency = 1
@@ -166,7 +163,7 @@ AutoLabel.TextXAlignment = Enum.TextXAlignment.Left
 AutoLabel.Parent = Content
 
 local AutoStatusLabel = Instance.new("TextLabel")
-AutoStatusLabel.Text = "Status: OFF"
+AutoStatusLabel.Text = "Trạng thái: TẮT"
 AutoStatusLabel.Size = UDim2.new(0.5, 0, 0, 24)
 AutoStatusLabel.Position = UDim2.new(0.5, 0, 0, 72)
 AutoStatusLabel.BackgroundTransparency = 1
@@ -176,8 +173,9 @@ AutoStatusLabel.TextSize = 14
 AutoStatusLabel.TextXAlignment = Enum.TextXAlignment.Right
 AutoStatusLabel.Parent = Content
 
+-- Nút BẬT/TẮT Auto Execute (bo góc + LED RGB)
 local AutoToggleButton = Instance.new("TextButton")
-AutoToggleButton.Text = "TOGGLE"
+AutoToggleButton.Text = "BẬT"
 AutoToggleButton.Size = UDim2.new(1, 0, 0, 32)
 AutoToggleButton.Position = UDim2.new(0, 0, 0, 102)
 AutoToggleButton.BackgroundColor3 = Color3.fromRGB(70, 70, 90)
@@ -190,16 +188,7 @@ local UICornerAuto = Instance.new("UICorner")
 UICornerAuto.CornerRadius = UDim.new(0, 8)
 UICornerAuto.Parent = AutoToggleButton
 
-AutoToggleButton.MouseEnter:Connect(function()
-    AutoToggleButton.BackgroundColor3 = Color3.fromRGB(90, 90, 110)
-end)
-
-AutoToggleButton.MouseLeave:Connect(function()
-    if not VolcanoModule.AutoExecute then
-        AutoToggleButton.BackgroundColor3 = Color3.fromRGB(70, 70, 90)
-    end
-end)
-
+-- Credit
 local CreditLabel = Instance.new("TextLabel")
 CreditLabel.Text = "Script by TamPham"
 CreditLabel.Size = UDim2.new(1, -10, 0, 20)
@@ -211,6 +200,7 @@ CreditLabel.TextSize = 12
 CreditLabel.TextXAlignment = Enum.TextXAlignment.Right
 CreditLabel.Parent = Frame
 
+-- Logic chính
 local function processVolcanoes()
     local character = Player.Character
     if not character or not character:FindFirstChild("HumanoidRootPart") then return end
@@ -246,22 +236,26 @@ end
 
 local function updateStatus()
     if VolcanoModule.Running then
-        StatusLabel.Text = "Status: ON"
+        StatusLabel.Text = "Trạng thái: BẬT"
         StatusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+        ToggleButton.Text = "TẮT"
         ToggleButton.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
     else
-        StatusLabel.Text = "Status: OFF"
+        StatusLabel.Text = "Trạng thái: TẮT"
         StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+        ToggleButton.Text = "BẬT"
         ToggleButton.BackgroundColor3 = Color3.fromRGB(70, 70, 90)
     end
     
     if VolcanoModule.AutoExecute then
-        AutoStatusLabel.Text = "Status: ON"
+        AutoStatusLabel.Text = "Trạng thái: BẬT"
         AutoStatusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+        AutoToggleButton.Text = "TẮT"
         AutoToggleButton.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
     else
-        AutoStatusLabel.Text = "Status: OFF"
+        AutoStatusLabel.Text = "Trạng thái: TẮT"
         AutoStatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+        AutoToggleButton.Text = "BẬT"
         AutoToggleButton.BackgroundColor3 = Color3.fromRGB(70, 70, 90)
     end
 end
