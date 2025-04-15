@@ -19,27 +19,36 @@ local UICorner = Instance.new("UICorner")
 UICorner.CornerRadius = UDim.new(0, 12)
 UICorner.Parent = Frame
 
-local LEDColors = {
-    Color3.fromRGB(255, 0, 0),
-    Color3.fromRGB(255, 127, 0),
-    Color3.fromRGB(255, 255, 0),
-    Color3.fromRGB(0, 255, 0),
-    Color3.fromRGB(0, 0, 255),
-    Color3.fromRGB(75, 0, 130),
-    Color3.fromRGB(148, 0, 211)
+-- Tạo hiệu ứng RGB chạy vòng quanh
+local borderParts = {}
+local borderPoints = {
+    {Position = UDim2.new(0, 0, 0, 0), Size = UDim2.new(1, 0, 0, 2)}, -- Top
+    {Position = UDim2.new(1, -2, 0, 0), Size = UDim2.new(0, 2, 1, 0)}, -- Right
+    {Position = UDim2.new(0, 0, 1, -2), Size = UDim2.new(1, 0, 0, 2)}, -- Bottom
+    {Position = UDim2.new(0, 0, 0, 0), Size = UDim2.new(0, 2, 1, 0)}  -- Left
 }
 
-local UIStroke = Instance.new("UIStroke")
-UIStroke.Color = LEDColors[1]
-UIStroke.Thickness = 3
-UIStroke.Parent = Frame
+for i, point in ipairs(borderPoints) do
+    local part = Instance.new("Frame")
+    part.Size = point.Size
+    part.Position = point.Position
+    part.BackgroundColor3 = Color3.fromHSV(i/#borderPoints, 1, 1)
+    part.BorderSizePixel = 0
+    part.ZIndex = 2
+    part.Parent = Frame
+    table.insert(borderParts, part)
+end
 
-local currentLEDIndex = 1
+-- Animation RGB chạy mượt
 task.spawn(function()
+    local offset = 0
     while ScreenGui.Parent do
-        currentLEDIndex = currentLEDIndex % #LEDColors + 1
-        UIStroke.Color = LEDColors[currentLEDIndex]
-        task.wait(0.5)
+        offset = (offset + 0.01) % 1
+        for i, part in ipairs(borderParts) do
+            local hue = (offset + (i-1)/#borderParts) % 1
+            part.BackgroundColor3 = Color3.fromHSV(hue, 1, 1)
+        end
+        task.wait(0.03)
     end
 end)
 
